@@ -1,0 +1,5 @@
+{"id": "1", "context": "Paris is the capital of France.", "question": "What is the capital of France?", "answer": "Paris"}
+{"id": "2", "context": "The tallest mountain on Earth is Mount Everest.", "question": "What is the tallest mountain on Earth?", "answer": "Mount Everest"}
+{"id": "3", "context": "Water freezes at 0 degrees Celsius.", "question": "At what temperature does water freeze in Celsius?", "answer": "0 degrees Celsius"}
+{"id": "4", "context": "The author of Hamlet is William Shakespeare.", "question": "Who wrote Hamlet?", "answer": "William Shakespeare"}
+{"id": "5", "context": "The chemical symbol for gold is Au.", "question": "What is the chemical symbol for gold?", "answer": "Au"}

@@ -1,0 +1,43 @@
+experiment:
+  name: lora_qwen32b_smoke_v1
+  method: lora
+  output_dir: outputs/runs/lora_qwen32b_smoke_v1
+model:
+  base_model_name_or_path: models/qwen32b_base
+  torch_dtype: bfloat16
+  trust_remote_code: true
+  attn_implementation: eager
+  gradient_checkpointing: true
+data:
+  train_file: data/smoke/qa_10.jsonl
+  validation_file: data/smoke/qa_10.jsonl
+  test_file: data/smoke/qa_10.jsonl
+  prompt_style: qa_standard
+  max_seq_length: 1024
+  train_on_inputs: false
+training:
+  num_train_epochs: 20
+  per_device_train_batch_size: 1
+  per_device_eval_batch_size: 1
+  gradient_accumulation_steps: 1
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.0
+  max_grad_norm: 1.0
+  bf16: true
+  fp16: false
+  log_interval: 10
+  eval_interval: 50
+  save_interval: 100
+  save_total_limit: 2
+lora:
+  enabled: true
+  r: 16
+  alpha: 32
+  dropout: 0.05
+  target_modules: [q_proj, k_proj, v_proj, o_proj]
+evaluation:
+  generation_max_new_tokens: 32
+  do_sample: false
+  temperature: 0.0
+  top_p: 1.0

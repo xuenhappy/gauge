@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env
+hf_cache/
+.cache/
+outputs/
+models/qwen32b_base/
+.DS_Store
+.vscode/
+.idea/
