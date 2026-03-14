@@ -64,9 +64,6 @@ class CovariantGaugeAdapter(nn.Module):
         self.g_rel = nn.Parameter(torch.zeros(num_heads))
         self.g_val = nn.Parameter(torch.zeros(d_model))
 
-        # 这里只控制 delta_v 的总幅度
-        self.out_scale = nn.Parameter(torch.zeros(1))
-
         self.dropout = nn.Dropout(dropout)
 
         self._last_fields: Optional[Dict[str, torch.Tensor]] = None
@@ -83,7 +80,7 @@ class CovariantGaugeAdapter(nn.Module):
         nn.init.zeros_(self.g_attn)
         nn.init.zeros_(self.g_rel)
         nn.init.zeros_(self.g_val)
-        nn.init.zeros_(self.out_scale)
+    
 
     def _split(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -141,7 +138,7 @@ class CovariantGaugeAdapter(nn.Module):
 
         # 局域势修正
         delta_v = torch.tanh(self.g_val).view(1, 1, self.d_model) * self.value_proj(A_v_raw)
-        delta_v = torch.tanh(self.out_scale) * self.dropout(delta_v)
+        delta_v = self.dropout(delta_v)
 
         self._last_fields = {
             "A_q_raw": A_q_raw,
@@ -154,9 +151,9 @@ class CovariantGaugeAdapter(nn.Module):
 
     def regularization_loss(self) -> torch.Tensor:
         if self._last_fields is None:
-            return torch.tensor(0.0, device=self.out_scale.device)
+            return torch.tensor(0.0, device=self.g_val.device)
 
-        loss = torch.tensor(0.0, device=self.out_scale.device)
+        loss = torch.tensor(0.0, device=self.g_val.device)
 
         if self.field_l2_weight > 0:
             l2 = 0.0
