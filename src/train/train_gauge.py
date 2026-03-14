@@ -75,5 +75,12 @@ def run_gauge(cfg):
     final_dir = os.path.join(out, 'final')
     trainer.save_model(final_dir)
     tokenizer.save_pretrained(final_dir)
+    run_evaluation(
+        cfg=cfg,
+        checkpoint_path=final_dir,
+        output_dir=out,
+        model=trainer.model,
+        tokenizer=tokenizer,
+    )
     trainer.dump_gauge_stats(tag='final')
     return final_dir
