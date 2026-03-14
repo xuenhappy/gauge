@@ -63,5 +63,11 @@ def run_lora(cfg):
     final_dir = os.path.join(out, 'final')
     trainer.save_model(final_dir)
     tokenizer.save_pretrained(final_dir)
-    run_evaluation(cfg, final_dir, out)
+    run_evaluation(
+        cfg=cfg,
+        checkpoint_path=final_dir,
+        output_dir=out,
+        model=trainer.model,
+        tokenizer=tokenizer,
+    )
     return final_dir

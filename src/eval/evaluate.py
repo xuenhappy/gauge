@@ -9,21 +9,30 @@ from ..metrics.qa_metrics import compute_em_f1_rougel
 @torch.no_grad()
 def generate_answer(model, tokenizer, prompt, max_new_tokens=128):
     inputs = tokenizer(prompt, return_tensors='pt').to(model.device)
-    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False, temperature=0.0, top_p=1.0)
+    outputs = model.generate(**inputs, max_new_tokens=max_new_tokens, do_sample=False,pad_token_id=tokenizer.pad_token_id)
     return tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True).strip()
 
 
-def run_evaluation(cfg, checkpoint_path, output_dir):
+def run_evaluation(cfg, checkpoint_path=None, output_dir=None, model=None, tokenizer=None):
     os.makedirs(os.path.join(output_dir, 'metrics'), exist_ok=True)
     os.makedirs(os.path.join(output_dir, 'analysis'), exist_ok=True)
-    tokenizer = AutoTokenizer.from_pretrained(checkpoint_path,
-        trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
-    model = AutoModelForCausalLM.from_pretrained(checkpoint_path,
-        torch_dtype=torch.bfloat16 if cfg['model']['torch_dtype'] == 'bfloat16' else torch.float16,
-        trust_remote_code=cfg['model'].get('trust_remote_code', True),
-        attn_implementation=cfg['model'].get('attn_implementation', 'eager')).cuda().eval()
+    if tokenizer is None:
+        tokenizer = AutoTokenizer.from_pretrained(
+            checkpoint_path,
+            trust_remote_code=cfg["model"].get("trust_remote_code", True),
+        )
+        if tokenizer.pad_token is None:
+            tokenizer.pad_token = tokenizer.eos_token
+
+    if model is None:
+        model = AutoModelForCausalLM.from_pretrained(
+            checkpoint_path,
+            dtype=torch.bfloat16 if cfg["model"]["torch_dtype"] == "bfloat16" else torch.float16,
+            trust_remote_code=cfg["model"].get("trust_remote_code", True),
+            attn_implementation=cfg["model"].get("attn_implementation", "eager"),
+        ).cuda().eval()
+    else:
+        model = model.eval()
     ds = QADataset(cfg['data']['test_file'], build_prompt_from_style(cfg['data']['prompt_style']))
     preds = []
     refs = []
