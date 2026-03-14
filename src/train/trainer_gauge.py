@@ -48,7 +48,6 @@ class GaugeTrainer(Trainer):
                 ga = m.gauge_adapter
                 row = {
                     'module': name,
-                    'out_scale': float(torch.tanh(ga.out_scale).detach().cpu()),
                     'g_attn_norm': float(ga.g_attn.detach().norm().cpu()),
                     'g_val_norm': float(ga.g_val.detach().norm().cpu()),
                     'g_rel_norm': float(ga.g_rel.detach().norm().cpu())
