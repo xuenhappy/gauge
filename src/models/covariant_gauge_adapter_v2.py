@@ -72,7 +72,7 @@ class CovariantGaugeAdapter(nn.Module):
     def _reset_parameters(self, init_scale: float):
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                nn.init.normal_(m.weight, mean=0.0, std=init_scale)
+                nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
