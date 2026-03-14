@@ -1,5 +1,5 @@
 import argparse
-from src.eval.unified_loader import UnifiedQAPipeline
+from ..eval.unified_loader import UnifiedQAPipeline
 
 
 def main():
@@ -23,4 +23,5 @@ def main():
         print(pipe.answer(args.context, args.question))
 
 
-if __name__ == '__main__': main()
+if __name__ == '__main__':
+    main()

@@ -1,9 +1,9 @@
 import os, json, torch
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from src.data.qa_dataset import QADataset
-from src.train.prompts import build_prompt_from_style
-from src.metrics.qa_metrics import compute_em_f1_rougel
+from ..data.qa_dataset import QADataset
+from ..train.prompts import build_prompt_from_style
+from ..metrics.qa_metrics import compute_em_f1_rougel
 
 
 @torch.no_grad()

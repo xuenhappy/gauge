@@ -1,7 +1,7 @@
 import os, json, glob, yaml, argparse, torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
-from src.models.patch_qwen_gauge import patch_qwen_with_gauge
-from src.train.prompts import build_prompt_from_style
+from ..models.patch_qwen_gauge import patch_qwen_with_gauge
+from ..train.prompts import build_prompt_from_style
 
 
 def load_yaml(path):

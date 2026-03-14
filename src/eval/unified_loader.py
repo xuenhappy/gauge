@@ -1,10 +1,10 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from peft import PeftModel
-from src.models.registry import load_run_config, detect_run_method, get_final_dir
-from src.models.patch_qwen_gauge import patch_qwen_with_gauge
-from src.eval.gauge_infer import load_checkpoint_state_dict
-from src.train.prompts import build_prompt_from_style
+from ..models.registry import load_run_config, detect_run_method, get_final_dir
+from ..models.patch_qwen_gauge import patch_qwen_with_gauge
+from ..eval.gauge_infer import load_checkpoint_state_dict
+from ..train.prompts import build_prompt_from_style
 
 
 def _dtype(cfg):
@@ -15,7 +15,8 @@ def load_frozen_model(run_dir, device='cuda'):
     cfg = load_run_config(run_dir)
     model_name = cfg['model']['base_model_name_or_path']
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None: tokenizer.pad_token = tokenizer.eos_token
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype=_dtype(cfg),
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
@@ -28,7 +29,8 @@ def load_lora_model(run_dir, device='cuda'):
     model_name = cfg['model']['base_model_name_or_path']
     final_dir = get_final_dir(run_dir)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None: tokenizer.pad_token = tokenizer.eos_token
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
     base = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype=_dtype(cfg),
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
@@ -42,7 +44,8 @@ def load_gauge_model(run_dir, device='cuda'):
     model_name = cfg['model']['base_model_name_or_path']
     final_dir = get_final_dir(run_dir)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None: tokenizer.pad_token = tokenizer.eos_token
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype=_dtype(cfg),
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
@@ -81,7 +84,8 @@ class UnifiedQAPipeline:
         if self.method == 'frozen': self.model, self.tokenizer, self.cfg = load_frozen_model(run_dir, device=device)
         elif self.method == 'lora': self.model, self.tokenizer, self.cfg = load_lora_model(run_dir, device=device)
         elif self.method == 'gauge': self.model, self.tokenizer, self.cfg = load_gauge_model(run_dir, device=device)
-        else: raise ValueError(self.method)
+        else:
+            raise ValueError(self.method)
 
     def answer(self, context, question):
         return generate_answer(self.model, self.tokenizer, build_prompt(self.cfg, context, question), self.cfg)

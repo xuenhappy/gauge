@@ -1,7 +1,7 @@
 import os, json, argparse
-from src.data.qa_dataset import QADataset
-from src.train.prompts import build_prompt_from_style
-from src.eval.unified_loader import UnifiedQAPipeline
+from ..data.qa_dataset import QADataset
+from ..train.prompts import build_prompt_from_style
+from ..eval.unified_loader import UnifiedQAPipeline
 
 
 def main():
