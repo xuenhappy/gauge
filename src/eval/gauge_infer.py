@@ -2,7 +2,7 @@ import os, json, glob, yaml, argparse, torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from ..models.patch_qwen_gauge import patch_qwen_with_gauge
 from ..train.prompts import build_prompt_from_style
-
+from ..utils.config import align_model_and_tokenizer
 
 def load_yaml(path):
     with open(path, 'r', encoding='utf-8') as f:
@@ -43,13 +43,12 @@ def build_gauge_model_from_run(run_dir, device='cuda'):
     final_dir = os.path.join(run_dir, 'final')
     model_name = cfg['model']['base_model_name_or_path']
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype=torch.bfloat16 if cfg['model']['torch_dtype'] == 'bfloat16' else torch.float16,
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
         attn_implementation=cfg['model'].get('attn_implementation', 'eager'))
     model = patch_qwen_with_gauge(model, cfg['gauge'])
+    align_model_and_tokenizer(model, tokenizer)
     model.load_state_dict(load_checkpoint_state_dict(final_dir), strict=False)
     model.to(device).eval()
     return model, tokenizer, cfg

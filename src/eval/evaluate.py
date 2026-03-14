@@ -4,7 +4,7 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from ..data.qa_dataset import QADataset
 from ..train.prompts import build_prompt_from_style
 from ..metrics.qa_metrics import compute_em_f1_rougel
-
+from ..utils.config import align_model_and_tokenizer
 
 @torch.no_grad()
 def generate_answer(model, tokenizer, prompt, max_new_tokens=128):
@@ -21,8 +21,7 @@ def run_evaluation(cfg, checkpoint_path=None, output_dir=None, model=None, token
             checkpoint_path,
             trust_remote_code=cfg["model"].get("trust_remote_code", True),
         )
-        if tokenizer.pad_token is None:
-            tokenizer.pad_token = tokenizer.eos_token
+        
 
     if model is None:
         model = AutoModelForCausalLM.from_pretrained(
@@ -33,6 +32,7 @@ def run_evaluation(cfg, checkpoint_path=None, output_dir=None, model=None, token
         ).cuda().eval()
     else:
         model = model.eval()
+    align_model_and_tokenizer(model, tokenizer)
     ds = QADataset(cfg['data']['test_file'], build_prompt_from_style(cfg['data']['prompt_style']))
     preds = []
     refs = []

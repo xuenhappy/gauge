@@ -5,6 +5,7 @@ from ..data.qa_dataset import QADataset
 from ..data.collators import QACollator
 from ..train.prompts import build_prompt_from_style
 from ..eval.evaluate import run_evaluation
+from ..utils.config import align_model_and_tokenizer
 
 
 def run_lora(cfg):
@@ -14,11 +15,12 @@ def run_lora(cfg):
         yaml.safe_dump(cfg, f, allow_unicode=True, sort_keys=False)
     model_name = cfg['model']['base_model_name_or_path']
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None: tokenizer.pad_token = tokenizer.eos_token
+    align_model_and_tokenizer(model, tokenizer)
     model = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype='auto',
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
         attn_implementation=cfg['model'].get('attn_implementation', 'eager'))
+    
     if cfg['model'].get('gradient_checkpointing', False): model.gradient_checkpointing_enable()
     peft_config = LoraConfig(task_type=TaskType.CAUSAL_LM,
         inference_mode=False,

@@ -5,7 +5,7 @@ from ..models.registry import load_run_config, detect_run_method, get_final_dir
 from ..models.patch_qwen_gauge import patch_qwen_with_gauge
 from ..eval.gauge_infer import load_checkpoint_state_dict
 from ..train.prompts import build_prompt_from_style
-
+from ..utils.config import align_model_and_tokenizer
 
 def _dtype(cfg):
     return torch.bfloat16 if cfg['model']['torch_dtype'] == 'bfloat16' else torch.float16
@@ -29,12 +29,11 @@ def load_lora_model(run_dir, device='cuda'):
     model_name = cfg['model']['base_model_name_or_path']
     final_dir = get_final_dir(run_dir)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     base = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype=_dtype(cfg),
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
         attn_implementation=cfg['model'].get('attn_implementation', 'eager'))
+    align_model_and_tokenizer(base, tokenizer)
     model = PeftModel.from_pretrained(base, final_dir).to(device).eval()
     return model, tokenizer, cfg
 
@@ -44,12 +43,11 @@ def load_gauge_model(run_dir, device='cuda'):
     model_name = cfg['model']['base_model_name_or_path']
     final_dir = get_final_dir(run_dir)
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype=_dtype(cfg),
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
         attn_implementation=cfg['model'].get('attn_implementation', 'eager'))
+    align_model_and_tokenizer(model, tokenizer)
     model = patch_qwen_with_gauge(model, cfg['gauge'])
     model.load_state_dict(load_checkpoint_state_dict(final_dir), strict=False)
     model = model.to(device).eval()

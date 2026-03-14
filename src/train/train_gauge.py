@@ -5,7 +5,7 @@ from ..data.collators import QACollator
 from ..train.prompts import build_prompt_from_style
 from ..train.trainer_gauge import GaugeTrainer
 from ..models.patch_qwen_gauge import patch_qwen_with_gauge, freeze_base_model_except_gauge
-
+from ..utils.config import align_model_and_tokenizer
 
 def build_base_reference_model(cfg):
     if not cfg['gauge'].get('use_base_kl', False): return None
@@ -26,12 +26,11 @@ def run_gauge(cfg):
         yaml.safe_dump(cfg, f, allow_unicode=True, sort_keys=False)
     model_name = cfg['model']['base_model_name_or_path']
     tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=cfg['model'].get('trust_remote_code', True))
-    if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
     model = AutoModelForCausalLM.from_pretrained(model_name,
         torch_dtype='auto',
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
         attn_implementation=cfg['model'].get('attn_implementation', 'eager'))
+    align_model_and_tokenizer(model, tokenizer)
     if cfg['model'].get('gradient_checkpointing', False): model.gradient_checkpointing_enable()
     model = patch_qwen_with_gauge(model, cfg['gauge'])
     model = freeze_base_model_except_gauge(model)
