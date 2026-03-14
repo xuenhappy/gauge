@@ -89,9 +89,9 @@ def run_gauge(cfg):
             ga = module.gauge_adapter
             print(
                 name,
-                "g_attn_norm=", float(ga.g_attn.detach().cpu()),
-                "g_rel_norm=", float(ga.g_rel.detach().cpu()),
-                "g_val_norm=", float(ga.g_val.detach().cpu()),
+                "g_attn_norm=", float(ga.g_attn.detach().norm().cpu()),
+                "g_rel_norm=", float(ga.g_rel.detach().norm().cpu()),
+                "g_val_norm=", float(ga.g_val.detach().norm().cpu()),
             )
     trainer.dump_gauge_stats(tag='final')
     return final_dir
