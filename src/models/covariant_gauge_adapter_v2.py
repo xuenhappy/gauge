@@ -76,10 +76,10 @@ class CovariantGaugeAdapter(nn.Module):
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-        nn.init.uniform_(self.rel_bias_vec, a=-0.1, b=0.1)
-        nn.init.uniform_(self.g_attn, a=-0.1, b=0.1)
-        nn.init.uniform_(self.g_rel, a=-0.1, b=0.1)
-        nn.init.uniform_(self.g_val, a=-0.1, b=0.1)
+        nn.init.uniform_(self.rel_bias_vec, a=-0.2, b=0.2)
+        nn.init.uniform_(self.g_attn, a=-0.2, b=0.2)
+        nn.init.uniform_(self.g_rel, a=-0.2, b=0.2)
+        nn.init.zeros_(self.g_val)
     
 
     def _split(self, x: torch.Tensor) -> torch.Tensor:
