@@ -10,7 +10,8 @@ from ..utils.config import align_model_and_tokenizer
 from ..eval.evaluate import run_evaluation
 
 def build_base_reference_model(cfg):
-    if not cfg['gauge'].get('use_base_kl', False): return None
+    if not cfg['gauge'].get('use_base_kl', False): 
+        return None
     model = AutoModelForCausalLM.from_pretrained(cfg['model']['base_model_name_or_path'],
         torch_dtype='auto',
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
