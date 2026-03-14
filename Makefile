@@ -10,6 +10,9 @@ install:
 env-check:
 	$(VENV_ACTIVATE) && $(ENV_ACTIVATE) && $(PY) tools/check_dgx_spark.py
 
+model-download:
+	$(VENV_ACTIVATE) && $(ENV_ACTIVATE) && $(PY) tools/download_qwen_model.py
+
 make-squad-small:
 	$(VENV_ACTIVATE) && $(ENV_ACTIVATE) && $(PY) tools/make_squad_small.py --output_dir data/squad --train_size 2000 --dev_size 200 --test_size 200
 

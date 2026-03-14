@@ -23,10 +23,7 @@ make env-check
 下载基座模型到 `models/qwen32b_base`：
 
 ```bash
-python - << 'PY'
-from huggingface_hub import snapshot_download
-snapshot_download(repo_id='Qwen/Qwen2.5-32B', local_dir='models/qwen32b_base', local_dir_use_symlinks=False)
-PY
+make model-download
 ```
 
 运行：
