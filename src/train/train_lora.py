@@ -40,7 +40,7 @@ def run_lora(cfg):
         num_train_epochs=cfg['training']['num_train_epochs'],
         learning_rate=cfg['training']['learning_rate'],
         weight_decay=cfg['training']['weight_decay'],
-        warmup_ratio=cfg['training']['warmup_ratio'],
+        warmup_steps=int(len(train_dataset) * cfg['training']['num_train_epochs'] * cfg['training']['warmup_ratio']),
         logging_steps=cfg['training']['log_interval'],
         eval_steps=cfg['training']['eval_interval'],
         save_steps=cfg['training']['save_interval'],

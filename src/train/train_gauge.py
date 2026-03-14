@@ -40,6 +40,8 @@ def run_gauge(cfg):
     collator = QACollator(tokenizer,
         max_seq_length=cfg['data']['max_seq_length'],
         train_on_inputs=cfg['data'].get('train_on_inputs', False))
+
+    
     args = TrainingArguments(output_dir=out,
         per_device_train_batch_size=cfg['training']['per_device_train_batch_size'],
         per_device_eval_batch_size=cfg['training']['per_device_eval_batch_size'],
@@ -47,7 +49,7 @@ def run_gauge(cfg):
         num_train_epochs=cfg['training']['num_train_epochs'],
         learning_rate=cfg['training']['learning_rate'],
         weight_decay=cfg['training']['weight_decay'],
-        warmup_ratio=cfg['training']['warmup_ratio'],
+        warmup_steps=int(len(train_dataset) * cfg['training']['num_train_epochs'] * cfg['training']['warmup_ratio']),
         logging_steps=cfg['training']['log_interval'],
         eval_steps=cfg['training']['eval_interval'],
         save_steps=cfg['training']['save_interval'],
