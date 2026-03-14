@@ -48,7 +48,7 @@ def run_lora(cfg):
         bf16=cfg['training']['bf16'],
         fp16=cfg['training']['fp16'],
         max_grad_norm=cfg['training']['max_grad_norm'],
-        evaluation_strategy='steps',
+        eval_strategy='steps',
         save_strategy='steps',
         report_to=['tensorboard'],
         remove_unused_columns=False,
@@ -58,7 +58,7 @@ def run_lora(cfg):
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=collator,
-        tokenizer=tokenizer)
+        processing_class=tokenizer)
     trainer.train()
     final_dir = os.path.join(out, 'final')
     trainer.save_model(final_dir)

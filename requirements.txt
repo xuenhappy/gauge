@@ -1,14 +1,14 @@
 torch
-transformers
-accelerate
 peft
 sentencepiece
 safetensors
 pyyaml
 rouge-score
 tensorboard
-datasets
 tqdm
 matplotlib
 huggingface_hub
 streamlit
+transformers>=4.50
+datasets>=3.0
+accelerate>=0.33

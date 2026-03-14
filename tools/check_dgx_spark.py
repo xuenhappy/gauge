@@ -28,6 +28,10 @@ def main():
     print("\n=== Environment ===")
     print("HF_HOME =", os.environ.get("HF_HOME"))
     print("TRANSFORMERS_CACHE =", os.environ.get("TRANSFORMERS_CACHE"))
+    
+    print("\n=== Kernel ===")
+    print("flash_sdp:", torch.backends.cuda.flash_sdp_enabled())
+    print("sdpa:", torch.backends.cuda.sdp_kernel())
 
 
 if __name__ == "__main__":
