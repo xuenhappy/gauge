@@ -79,7 +79,7 @@ class CovariantGaugeAdapter(nn.Module):
         nn.init.uniform_(self.rel_bias_vec, a=-0.2, b=0.2)
         nn.init.uniform_(self.g_attn, a=-0.2, b=0.2)
         nn.init.uniform_(self.g_rel, a=-0.2, b=0.2)
-        nn.init.zeros_(self.g_val)
+        nn.init.uniform_(self.g_val, a=-2, b=2)
     
 
     def _split(self, x: torch.Tensor) -> torch.Tensor:
