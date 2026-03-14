@@ -77,8 +77,8 @@ class CovariantGaugeAdapter(nn.Module):
                     nn.init.zeros_(m.bias)
 
         nn.init.zeros_(self.rel_bias_vec)
-        nn.init.zeros_(self.g_attn)
-        nn.init.zeros_(self.g_rel)
+        nn.init.xavier_uniform_(self.g_attn, gain=1.0)
+        nn.init.xavier_uniform_(self.g_rel, gain=1.0)
         nn.init.zeros_(self.g_val)
     
 
