@@ -6,6 +6,7 @@ from ..train.prompts import build_prompt_from_style
 from ..train.trainer_gauge import GaugeTrainer
 from ..models.patch_qwen_gauge import patch_qwen_with_gauge, freeze_base_model_except_gauge
 from ..utils.config import align_model_and_tokenizer
+from ..eval.evaluate import run_evaluation
 
 def build_base_reference_model(cfg):
     if not cfg['gauge'].get('use_base_kl', False): return None
