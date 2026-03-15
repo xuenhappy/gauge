@@ -72,14 +72,14 @@ class CovariantGaugeAdapter(nn.Module):
     def _reset_parameters(self, init_scale: float):
         for m in self.modules():
             if isinstance(m, nn.Linear):
-                nn.init.xavier_uniform_(m.weight, gain=1.0)
+                nn.init.xavier_uniform_(m.weight, gain=0.1)
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
 
-        nn.init.uniform_(self.rel_bias_vec, a=-0.2, b=0.2)
-        nn.init.uniform_(self.g_attn, a=-0.2, b=0.2)
-        nn.init.uniform_(self.g_rel, a=-0.2, b=0.2)
-        nn.init.uniform_(self.g_val, a=-2, b=2)
+        nn.init.uniform_(self.rel_bias_vec,a=-0.1, b=0.1)
+        nn.init.uniform_(self.g_attn, a=-0.1, b=0.1)
+        nn.init.uniform_(self.g_rel, a=-0.1, b=0.1)
+        nn.init.uniform_(self.g_val, a=-1, b=1)
     
 
     def _split(self, x: torch.Tensor) -> torch.Tensor:
@@ -104,19 +104,21 @@ class CovariantGaugeAdapter(nn.Module):
 
         # b1 = <Q_i, A_k(j)>
         b1 = torch.matmul(q_base, A_kp.transpose(-2, -1)) / math.sqrt(self.head_dim)
-
         # b2 = <A_q(i), K_j>
         b2 = torch.matmul(A_qp, k_base.transpose(-2, -1)) / math.sqrt(self.head_dim)
+
 
         # b3 = w_h^T tanh(A_k(j) - A_q(i))
         rel = torch.tanh(A_k.unsqueeze(2) - A_q.unsqueeze(3))  # [B,H,S,S,Hd]
         relv = self.rel_bias_vec.view(1, self.num_heads, 1, 1, self.head_dim)
-        b3 = (rel * relv).sum(dim=-1)  # [B,H,S,S]
+        b3 = (rel * relv).sum(dim=-1)/ math.sqrt(self.head_dim)  # [B,H,S,S]
 
-        gauge_bias = (self.g_attn.view(1, self.num_heads, 1, 1) * (b1 + b2) +
-            self.g_rel.view(1, self.num_heads, 1, 1) * b3)
-        # 放置过大
-        gauge_bias = torch.clamp(gauge_bias, -30, 30)
+
+        # last
+        g_attn = torch.sigmoid(self.g_attn).view(1, self.num_heads, 1, 1)
+        g_rel  = torch.sigmoid(self.g_rel).view(1, self.num_heads, 1, 1)
+        gauge_bias = (g_attn *(b1 + b2) + g_rel * b3)
+        gauge_bias = torch.clamp(gauge_bias, -5.0, 5.0)
         return gauge_bias
 
     def forward(

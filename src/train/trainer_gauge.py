@@ -1,7 +1,8 @@
-import os, json, torch
+import os
+import json
+import torch
 import torch.nn.functional as F
 from transformers import Trainer
-
 
 class GaugeTrainer(Trainer):
 
@@ -27,6 +28,21 @@ class GaugeTrainer(Trainer):
                 cur = m.gauge_adapter.regularization_loss()
                 reg = cur if reg is None else reg + cur
         return reg if reg is not None else torch.tensor(0.0, device=self.model.device)
+
+    def _safe_zero_loss(self, ref_tensor: torch.Tensor) -> torch.Tensor:
+        """
+        返回一个与 ref_tensor 同设备同 dtype 的 0，并保持可参与反传。
+        """
+        return ref_tensor.sum() * 0.0
+
+    def _sanitize_loss(self, loss_tensor: torch.Tensor, name: str) -> torch.Tensor:
+        """
+        若 loss 为 NaN/Inf，则替换为 0，避免训练直接崩溃。
+        """
+        if not torch.isfinite(loss_tensor):
+            print(f"[GaugeTrainer] non-finite {name} detected: {loss_tensor.detach().float().item()}. Replacing with 0.")
+            return self._safe_zero_loss(loss_tensor)
+        return loss_tensor
 
     @torch.no_grad()
     def _compute_base_kl(self, inputs, model_outputs):
@@ -63,7 +79,7 @@ class GaugeTrainer(Trainer):
 
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
         outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['labels'])
-        ce = outputs.loss
+        ce = self._sanitize_loss(outputs.loss, "loss_ce")
         reg = self._collect_gauge_reg_loss(model)
         base_kl = self._compute_base_kl(inputs, outputs)
         total = ce + reg + self.base_kl_weight * base_kl
