@@ -64,9 +64,7 @@ class GaugeTrainer(Trainer):
                 ga = m.gauge_adapter
                 row = {
                     'module': name,
-                    'g_attn_norm': float(ga.g_attn.detach().norm().cpu()),
-                    'g_val_norm': float(ga.g_val.detach().norm().cpu()),
-                    'g_rel_norm': float(ga.g_rel.detach().norm().cpu())
+                    'g_val_norm': float(ga.g_val.detach().norm().cpu())
                 }
                 if getattr(ga, '_last_fields', None) is not None:
                     row['A_q_norm'] = float(ga._last_fields['A_q_raw'].detach().norm().cpu())

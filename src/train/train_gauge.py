@@ -87,14 +87,5 @@ def run_gauge(cfg):
         model=trainer.model,
         tokenizer=tokenizer,
     )
-    for name, module in model.named_modules():
-        if hasattr(module, "gauge_adapter"):
-            ga = module.gauge_adapter
-            print(
-                name,
-                "g_attn_norm=", float(ga.g_attn.detach().norm().cpu()),
-                "g_rel_norm=", float(ga.g_rel.detach().norm().cpu()),
-                "g_val_norm=", float(ga.g_val.detach().norm().cpu()),
-            )
     trainer.dump_gauge_stats(tag='final')
     return final_dir

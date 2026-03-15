@@ -115,10 +115,10 @@ class CovariantGaugeAdapter(nn.Module):
 
 
         # last
-        g_attn = torch.sigmoid(self.g_attn).view(1, self.num_heads, 1, 1)
-        g_rel  = torch.sigmoid(self.g_rel).view(1, self.num_heads, 1, 1)
-        gauge_bias = (g_attn *(b1 + b2) + g_rel * b3)
-        gauge_bias = torch.clamp(gauge_bias, -4.0, 4.0)
+        g_attn = torch.tanh(self.g_attn).view(1, self.num_heads, 1, 1)
+        g_rel  = torch.tanh(self.g_rel).view(1, self.num_heads, 1, 1)
+        gauge_bias = (g_attn *(b1 + b2) + g_rel * b3)/3.0
+        gauge_bias = torch.clamp(gauge_bias, -2.0, 2.0)
         return gauge_bias
 
     def forward(
