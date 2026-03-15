@@ -32,7 +32,8 @@ training:
   save_total_limit: 2
 gauge:
   enabled: true
-  target_layers: [36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63]
+  target_layers:
+    [38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56]
   rank: 32
   dropout: 0.0
   use_layernorm: true

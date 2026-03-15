@@ -115,6 +115,8 @@ class CovariantGaugeAdapter(nn.Module):
 
         gauge_bias = (self.g_attn.view(1, self.num_heads, 1, 1) * (b1 + b2) +
             self.g_rel.view(1, self.num_heads, 1, 1) * b3)
+        # 放置过大
+        gauge_bias = torch.clamp(gauge_bias, -30, 30)
         return gauge_bias
 
     def forward(

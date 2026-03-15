@@ -17,6 +17,7 @@ def build_base_reference_model(cfg):
         trust_remote_code=cfg['model'].get('trust_remote_code', True),
         attn_implementation=cfg['model'].get('attn_implementation', 'eager'))
     model.eval()
+    model.config.use_cache = False
     for p in model.parameters():
         p.requires_grad = False
     return model
@@ -37,6 +38,7 @@ def run_gauge(cfg):
     if cfg['model'].get('gradient_checkpointing', False): model.gradient_checkpointing_enable()
     model = patch_qwen_with_gauge(model, cfg['gauge'])
     model = freeze_base_model_except_gauge(model)
+    model.config.use_cache = False
     train_dataset = QADataset(cfg['data']['train_file'], build_prompt_from_style(cfg['data']['prompt_style']))
     eval_dataset = QADataset(cfg['data']['validation_file'], build_prompt_from_style(cfg['data']['prompt_style']))
     collator = QACollator(tokenizer,
