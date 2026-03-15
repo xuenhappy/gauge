@@ -13,7 +13,7 @@ data:
   validation_file: data/squad/train_small.jsonl
   test_file: data/squad/train_small.jsonl
   prompt_style: qa_standard
-  max_seq_length: 512
+  max_seq_length: 800
   train_on_inputs: false
 training:
   num_train_epochs: 3
