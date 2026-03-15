@@ -75,7 +75,14 @@ class GaugeTrainer(Trainer):
         with open(os.path.join(self.output_dir, 'analysis', f'gauge_stats_{tag}.json'), 'w', encoding='utf-8') as f:
             json.dump(rows, f, indent=2, ensure_ascii=False)
 
+
     def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        valid_label_count = (inputs["labels"] != -100).sum()
+        if valid_label_count.item() == 0:
+            print("[GaugeTrainer] zero valid labels in batch, skipping.")
+            zero = model.get_input_embeddings().weight.sum() * 0.0
+            return zero
+
         outputs = model(input_ids=inputs['input_ids'], attention_mask=inputs['attention_mask'], labels=inputs['labels'])
         ce = self._sanitize_loss(outputs.loss, "loss_ce")
         reg = self._collect_gauge_reg_loss(model)
